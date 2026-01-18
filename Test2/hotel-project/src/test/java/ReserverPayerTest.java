@@ -6,21 +6,20 @@ class ReserverPayerTest {
 
     @Test
     void validCard_success() {
-        // Arrange
-        ReserverPayer rp = new ReserverPayer("444014185223", "RP01");
-
-        // Act
-        String card = rp.getCard();
-
+        // FIX: Use a 16-digit number to pass the validation check
+        String validCard = "1111222233334444"; 
+        ReserverPayer rp = new ReserverPayer(validCard, "Ali");
+        
         // Assert
-        assertNotNull(card);
+        assertEquals(validCard, rp.getCard());
     }
 
     @Test
-    void invalidCard_throwException() {
-        // Arrange + Act + Assert
+    void invalidCard_throwsException() {
+        // This test ensures the defensive programming works!
+        // It expects an error when the card is too short
         assertThrows(IllegalArgumentException.class, () -> {
-            new ReserverPayer("123", "RP01");
+            new ReserverPayer("123", "Ali"); // Invalid (too short)
         });
     }
 }
