@@ -3,6 +3,13 @@ public class RoomType {
     private double cost;
 
     public RoomType(String kind, double cost) {
+        if (kind == null || kind.trim().isEmpty()) {
+            throw new IllegalArgumentException("Room type cannot be empty.");
+        }
+        if (cost <= 0) {
+            throw new IllegalArgumentException("Room cost must be positive.");
+        }
+
         this.kind = kind;
         this.cost = cost;
     }
