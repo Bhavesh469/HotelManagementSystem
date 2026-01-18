@@ -1,3 +1,4 @@
+package com.hotel;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Scanner;
@@ -54,7 +55,7 @@ public class Main {
             chain.addHotel(h5);
 
             // 5️⃣ Reserver / Payer
-            System.out.print("Enter Card Number (min 14 digits): ");
+            System.out.print("Enter Card Number (min 13 digits): ");
             String card = sc.nextLine();
             ReserverPayer rp = new ReserverPayer(card, "RP001");
             chain.createReserverPayer(rp);

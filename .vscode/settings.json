@@ -1,0 +1,13 @@
+{
+    "java.project.sourcePaths": [
+        "src",
+        "Test"
+    ],
+    "java.project.referencedLibraries": [
+        "lib\\junit-jupiter-api-5.14.2.jar",
+        "lib\\junit-jupiter-params-5.14.2.jar",
+        "lib\\junit-platform-commons-1.10.2.jar"
+    ],
+    "java.project.outputPath": "out",
+    "java.configuration.updateBuildConfiguration": "interactive"
+}

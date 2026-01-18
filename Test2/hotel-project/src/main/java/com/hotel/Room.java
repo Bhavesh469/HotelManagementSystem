@@ -1,3 +1,5 @@
+package com.hotel;
+
 public class Room {
     private int number;
     private RoomType type;

@@ -1,9 +1,10 @@
+package com.hotel;
 public class ReserverPayer {
     private String creditCardDetails;
     private String id;
 
     public ReserverPayer(String creditCardDetails, String id) {
-        if (creditCardDetails == null || creditCardDetails.length() < 14) {
+        if (creditCardDetails == null || creditCardDetails.length() < 13) {
             throw new IllegalArgumentException("Invalid card number.");
         }
         if (id == null || id.trim().isEmpty()) {

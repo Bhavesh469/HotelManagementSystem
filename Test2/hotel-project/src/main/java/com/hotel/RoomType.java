@@ -1,3 +1,4 @@
+package com.hotel;
 public class RoomType {
     private String kind;
     private double cost;

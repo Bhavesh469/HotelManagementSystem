@@ -1,3 +1,4 @@
+package com.hotel;
 public class HowMany {
     private int number;
 

@@ -1,3 +1,4 @@
+package com.hotel;
 import java.util.ArrayList;
 import java.util.Date;
 
