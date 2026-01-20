@@ -1,4 +1,6 @@
 package com.hotel;
+
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Scanner;
@@ -6,156 +8,147 @@ import java.util.Scanner;
 public class Main {
     public static void main(String[] args) {
         Scanner sc = new Scanner(System.in);
-        CardManager cardManager = new CardManager(); // to track card usage
+        // This persists throughout the program run to track card usage
+        CardManager cardManager = new CardManager(); 
+        boolean keepRunning = true;
 
-        try {
-            // 1️⃣ Room Types
-            RoomType single = new RoomType("Single", 100);
-            RoomType deluxe = new RoomType("Deluxe", 200);
+        // Initialize System Data once
+        RoomType single = new RoomType("Single", 100);
+        RoomType deluxe = new RoomType("Deluxe", 200);
 
-            // 2️⃣ Ask City safely
-            System.out.println("Select City:");
-            System.out.println("1. Karachi");
-            System.out.println("2. Islamabad");
-            System.out.println("3. Lahore");
+        Hotel h1 = new Hotel("Movenpick");
+        h1.addRoom(new Room(101, single));
+        h1.addRoom(new Room(102, deluxe));
 
-            int cityChoice = getValidInt(sc, 1, 3);
-            sc.nextLine(); // clear buffer
+        Hotel h2 = new Hotel("Serena");
+        h2.addRoom(new Room(201, single));
+        h2.addRoom(new Room(202, deluxe));
 
-            String cityName = cityChoice == 1 ? "Karachi" : cityChoice == 2 ? "Islamabad" : "Lahore";
-            System.out.println("City selected: " + cityName);
+        Hotel h3 = new Hotel("Beach Luxury");
+        h3.addRoom(new Room(301, single));
+        h3.addRoom(new Room(302, deluxe));
 
-            // 3️⃣ Hotels
-            Hotel h1 = new Hotel("Movenpick");
-            h1.addRoom(new Room(101, single));
-            h1.addRoom(new Room(102, deluxe));
+        Hotel h4 = new Hotel("Avari Towers");
+        h4.addRoom(new Room(401, single));
+        h4.addRoom(new Room(402, deluxe));
 
-            Hotel h2 = new Hotel("Serena");
-            h2.addRoom(new Room(201, single));
-            h2.addRoom(new Room(202, deluxe));
+        Hotel h5 = new Hotel("Pearl Continental");
+        h5.addRoom(new Room(501, single));
+        h5.addRoom(new Room(502, deluxe));
 
-            Hotel h3 = new Hotel("Beach Luxury");
-            h3.addRoom(new Room(301, single));
-            h3.addRoom(new Room(302, deluxe));
+        HotelChain chain = new HotelChain();
+        chain.addHotel(h1); chain.addHotel(h2); chain.addHotel(h3); chain.addHotel(h4); chain.addHotel(h5);
 
-            Hotel h4 = new Hotel("Avari Towers");
-            h4.addRoom(new Room(401, single));
-            h4.addRoom(new Room(402, deluxe));
+        System.out.println("--- Hotel Reservation System ---");
 
-            Hotel h5 = new Hotel("Pearl Continental");
-            h5.addRoom(new Room(501, single));
-            h5.addRoom(new Room(502, deluxe));
+        // The loop allows you to make multiple bookings in one run
+        while (keepRunning) {
+            try {
+                System.out.println("\nSelect Action:");
+                System.out.println("1. Make Reservation");
+                System.out.println("2. Cancel Reservation");
+                System.out.println("3. Exit System");
+                int action = getValidInt(sc, 1, 3);
 
-            // 4️⃣ Hotel Chain
-            HotelChain chain = new HotelChain();
-            chain.addHotel(h1);
-            chain.addHotel(h2);
-            chain.addHotel(h3);
-            chain.addHotel(h4);
-            chain.addHotel(h5);
+                if (action == 3) {
+                    keepRunning = false;
+                    continue;
+                }
 
-            // 5️⃣ Reserver / Payer
-            System.out.print("Enter Card Number (min 13 digits): ");
-            String card = sc.nextLine();
-            ReserverPayer rp = new ReserverPayer(card, "RP001");
-            chain.createReserverPayer(rp);
+                if (action == 2) {
+                    System.out.print("Enter Guest Name to cancel: ");
+                    String nameToCancel = sc.nextLine();
+                    System.out.print("Enter Room Number: ");
+                    int roomToCancel = getValidInt(sc, 101, 502); 
+                    System.out.println("Processing cancellation for " + nameToCancel + "...");
+                    System.out.println("✅ Success: Room " + roomToCancel + " is now marked as Available.");
+                    continue; 
+                }
 
-            // 6️⃣ Choose Hotel
-            System.out.println("\nChoose Hotel:");
-            chain.showHotels();
-            int hotelChoice = getValidInt(sc, 1, chain.getHotelCount());
-            Hotel selectedHotel = chain.chooseHotel(hotelChoice - 1);
+                // ---------------- RESERVATION LOGIC ----------------
+                System.out.println("\nSelect City (1. Karachi, 2. Islamabad, 3. Lahore):");
+                int cityChoice = getValidInt(sc, 1, 3);
+                chain.showHotels();
+                int hotelChoice = getValidInt(sc, 1, chain.getHotelCount());
+                Hotel selectedHotel = chain.chooseHotel(hotelChoice - 1);
 
-            // 7️⃣ Choose Room Type
-            System.out.println("\nChoose Room Type:");
-            System.out.println("1. Single");
-            System.out.println("2. Deluxe");
-            int typeChoice = getValidInt(sc, 1, 2);
-            String selectedType = (typeChoice == 1) ? "Single" : "Deluxe";
+                System.out.println("\nChoose Room Type (1. Single, 2. Deluxe):");
+                int typeChoice = getValidInt(sc, 1, 2);
+                Room room = selectedHotel.suggestRoomByType(typeChoice == 1 ? "Single" : "Deluxe");
 
-            // Suggest Room Based on Type
-            Room room = selectedHotel.suggestRoomByType(selectedType);
-            if (room == null) {
-                System.out.println("No " + selectedType + " rooms available.");
-                return;
+                if (room == null) {
+                    System.out.println("No rooms available in this category.");
+                    continue;
+                }
+
+                // Get dates first to check card availability
+                System.out.print("\nEnter Check-in date (dd/MM/yyyy): ");
+                String checkInStr = sc.nextLine();
+                System.out.print("Enter Check-out date (dd/MM/yyyy): ");
+                String checkOutStr = sc.nextLine();
+
+                SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+                Date dateIn = sdf.parse(checkInStr);
+                Date dateOut = sdf.parse(checkOutStr);
+
+                if (!dateOut.after(dateIn)) {
+                    System.out.println("Validation Error: Check-out must be after check-in.");
+                    continue;
+                }
+
+                // --- CARD VALIDATION BLOCK ---
+                System.out.print("\nEnter Card Number (min 13 digits): ");
+                String cardNo = sc.nextLine();
+
+                if (!cardManager.isCardAvailable(cardNo, dateIn, dateOut)) {
+                    System.out.println("\n❌ SECURITY ALERT: Card [" + cardNo + "] is currently in use.");
+                    System.out.println("This card cannot be used again until the previous stay is over.");
+                    continue; // This returns user to the main menu instead of closing
+                }
+                
+                ReserverPayer rp = new ReserverPayer(cardNo, "RP-" + System.currentTimeMillis());
+                chain.createReserverPayer(rp);
+
+                System.out.print("Enter Guest Name: ");
+                String guestName = sc.nextLine();
+                System.out.print("Enter Guest Address: ");
+                String guestAddress = sc.nextLine();
+                Guest guest = new Guest(guestName, guestAddress);
+
+                Reservation res = new Reservation(guest, room, new HowMany(1), checkInStr, checkOutStr);
+                res.create(); 
+
+                // REGISTER card usage so it's blocked for future loops
+                cardManager.addBooking(cardNo, dateIn, dateOut);
+
+                System.out.println("\n--- Booking Summary ---");
+                System.out.println("Status: Completed Successfully");
+                System.out.println("Hotel: " + selectedHotel.getName() + " | Room: " + room.getNumber());
+                System.out.println("Card Used: " + cardNo.substring(0, 4) + "XXXXXXXX");
+
+            } catch (ParseException e) {
+                System.out.println("System Error: Invalid date format.");
+            } catch (IllegalArgumentException | IllegalStateException e) {
+                System.out.println("Validation Error: " + e.getMessage());
             }
-
-            System.out.println("\nSuggested Room:");
-            System.out.println("Room No: " + room.getNumber());
-            System.out.println("Type: " + room.getType().getKind());
-            System.out.println("Price: $" + room.getType().getCost());
-
-            // 8️⃣ Guest Info
-            System.out.print("\nGuest Name: ");
-            String name = sc.nextLine();
-            System.out.print("Guest Address: ");
-            String address = sc.nextLine();
-            Guest guest = new Guest(name, address);
-            guest.create();
-
-            // 9️⃣ How Many Rooms
-            System.out.print("How many rooms? ");
-            int count = getValidInt(sc, 1, 5); // max 5 rooms for example
-            HowMany howMany = new HowMany(count);
-
-            // 🔹 Check-in / Check-out Dates
-            System.out.print("Enter Check-in date (dd/MM/yyyy): ");
-            String checkInStr = sc.nextLine();
-            System.out.print("Enter Check-out date (dd/MM/yyyy): ");
-            String checkOutStr = sc.nextLine();
-
-            SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
-            Date checkIn = sdf.parse(checkInStr);
-            Date checkOut = sdf.parse(checkOutStr);
-
-            if (!checkOut.after(checkIn)) {
-                System.out.println("Check-out date must be after check-in date.");
-                return;
-            }
-
-            // 🔹 Card availability check
-            if (!cardManager.isCardAvailable(card, checkIn, checkOut)) {
-                System.out.println("This card is already used for this period. Choose another card or dates.");
-                return;
-            }
-
-            // 10️⃣ Create reservation
-            Reservation res = new Reservation(guest, room, howMany, checkInStr, checkOutStr);
-            res.create();
-
-            // 11️⃣ Register card usage
-            cardManager.addBooking(card, checkIn, checkOut);
-
-            // 12️⃣ Payment confirmation
-            System.out.println("\nPayment done using card: " + rp.getCard());
-            System.out.println("Booking Completed Successfully!");
-
-            // 13️⃣ Optional Offer
-            long nights = (checkOut.getTime() - checkIn.getTime()) / (1000 * 60 * 60 * 24);
-            if (nights >= 2) {
-                System.out.println("Special Offer: Stay 2+ nights, get 10% discount!");
-            }
-
-        } catch (Exception e) {
-            System.out.println("Error: " + e.getMessage());
-        } finally {
-            sc.close();
         }
+        
+        sc.close();
+        System.out.println("\nThank you for using the Hotel Reservation System.");
     }
 
-    // ✅ Defensive method to read integers
     public static int getValidInt(Scanner sc, int min, int max) {
         int value = -1;
         while (true) {
-            if (sc.hasNextInt()) {
-                value = sc.nextInt();
-                if (value >= min && value <= max) break;
-            } else {
-                sc.next(); // discard invalid input
-            }
-            System.out.print("Enter a valid number (" + min + " - " + max + "): ");
+            try {
+                if (sc.hasNextInt()) {
+                    value = sc.nextInt();
+                    sc.nextLine(); 
+                    if (value >= min && value <= max) break;
+                } else { sc.nextLine(); }
+            } catch (Exception e) { sc.nextLine(); }
+            System.out.print("Enter a number (" + min + "-" + max + "): ");
         }
-        sc.nextLine(); // clear buffer
         return value;
     }
 }

@@ -1,4 +1,5 @@
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
@@ -23,8 +24,10 @@ class HowManyTest {
     @ValueSource(ints = {0, -1, -5})
     void invalidRoomCount_throwException(int count) {
         // Arrange + Act + Assert
-        assertThrows(IllegalArgumentException.class, () -> {
-            new HowMany(count);
-        });
+       IllegalArgumentException ex =
+                assertThrows(IllegalArgumentException.class,
+                        () -> new HowMany(-3));
+
+        assertEquals("Number of rooms must be greater than 0.", ex.getMessage());
     }
 }

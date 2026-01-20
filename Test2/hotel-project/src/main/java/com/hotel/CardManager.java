@@ -15,7 +15,8 @@ public class CardManager {
         }
     }
 
-    private ArrayList<CardBooking> bookings = new ArrayList<>();
+   private final ArrayList<CardBooking> bookings = new ArrayList<>();
+
 
     public boolean isCardAvailable(String cardNumber, Date checkIn, Date checkOut) {
         for (CardBooking cb : bookings) {

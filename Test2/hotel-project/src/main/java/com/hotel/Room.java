@@ -1,9 +1,12 @@
 package com.hotel;
 
 public class Room {
-    private int number;
-    private RoomType type;
+
+    private final int number;
+    private final RoomType type;
     private boolean occupied = false;
+
+    // ---------------- CONSTRUCTOR ----------------
 
     public Room(int number, RoomType type) {
         if (number <= 0) {
@@ -17,9 +20,13 @@ public class Room {
         this.type = type;
     }
 
+    // ---------------- STATUS ----------------
+
     public boolean isAvailable() {
         return !occupied;
     }
+
+    // ---------------- ACTIONS ----------------
 
     public void createGuest(Guest guest) {
         if (occupied) {
@@ -33,6 +40,17 @@ public class Room {
         System.out.println("Guest " + guest.getName() + " assigned to Room " + number);
     }
 
+    public void checkout() {
+        if (!occupied) {
+            throw new IllegalStateException("Room is already empty.");
+        }
+
+        occupied = false;
+        System.out.println("Room " + number + " is now available.");
+    }
+
+    // ---------------- GETTERS ----------------
+
     public int getNumber() {
         return number;
     }
@@ -40,5 +58,4 @@ public class Room {
     public RoomType getType() {
         return type;
     }
-   
 }

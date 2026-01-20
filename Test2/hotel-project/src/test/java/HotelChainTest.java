@@ -1,4 +1,6 @@
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import org.junit.jupiter.api.Test;
 
 import com.hotel.Hotel;
@@ -17,16 +19,21 @@ class HotelChainTest {
 
         // Assert
         assertNotNull(hotel);
+        assertEquals("PC", hotel.getName());
     }
 
-    @Test
-    void chooseHotel_invalidIndex_throwException() {
-        // Arrange
-        HotelChain chain = new HotelChain();
+  @Test
+void chooseHotel_invalidIndex_throwException() {
+    // Arrange
+    HotelChain chain = new HotelChain();
 
-        // Act + Assert
-        assertThrows(IllegalArgumentException.class, () -> {
-            chain.chooseHotel(5);
-        });
-    }
+    // Change IndexOutOfBoundsException to IllegalArgumentException 
+    // to match what your HotelChain.java is actually throwing
+    IllegalArgumentException ex = assertThrows(IllegalArgumentException.class, () -> {
+        chain.chooseHotel(99); 
+    });
+
+    // Verify the error message
+    assertEquals("Invalid hotel selection.", ex.getMessage());
+}
 }

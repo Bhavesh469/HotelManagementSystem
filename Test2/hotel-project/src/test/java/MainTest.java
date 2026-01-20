@@ -1,10 +1,13 @@
-import com.hotel.Main;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 import java.util.Scanner;
-import static org.junit.jupiter.api.Assertions.*;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.Test;
+
+import com.hotel.Main;
 
 class MainTest {
 
@@ -21,37 +24,37 @@ class MainTest {
         return testOut;
     }
 
-    @Test
-    void testMain_HappyPath_SuccessfulBooking() {
-        // 1. Simulate the exact keystrokes a user would make:
-        // City(1) -> Extra Enter -> Card -> Hotel(1) -> RoomType(1) -> Name -> Address -> Count(1) -> DateIn -> DateOut
-        // Note: Your Main.java has an extra sc.nextLine() after city, so we add an extra \n in the input string.
-        String input = "1\n" +                  // Select Karachi
-                       "\n" +                   // Consumed by the extra sc.nextLine() in your Main.java
-                       "1234567890123456\n" +   // Card Number
-                       "1\n" +                  // Select Hotel 1 (Movenpick)
-                       "1\n" +                  // Select Room Type (Single)
-                       "Ali\n" +                // Guest Name
-                       "Clifton, Karachi\n" +   // Address
-                       "1\n" +                  // How many rooms
-                       "10/01/2026\n" +         // Check-in
-                       "15/01/2026\n";          // Check-out
+   @Test
+void testMain_HappyPath_SuccessfulBooking() {
+    // This string simulates a real user typing into the console
+    String input = "1\n" +            // Select Action: 1. Make Reservation
+                   "1\n" +            // Select City: 1. Karachi
+                   "1\n" +            // Select Hotel: 1. Movenpick
+                   "1\n" +            // Choose Room Type: 1. Single
+                   "20/02/2026\n" +    // Check-in date
+                   "22/02/2026\n" +    // Check-out date
+                   "1234567890123\n" + // Card Number (min 13 digits)
+                   "Ali\n" +           // Guest Name
+                   "Karachi Address\n" +// Guest Address
+                   "3\n";              // Select Action: 3. Exit System
 
-        provideInput(input);
-        ByteArrayOutputStream output = captureOutput();
+    provideInput(input);
+    ByteArrayOutputStream output = captureOutput();
 
-        // 2. Run the Main method
-        Main.main(new String[]{});
+    Main.main(new String[]{});
 
-        // 3. Verify the output contains success messages
-        String consoleOutput = output.toString();
-        
-        // Check key milestones
-        assertTrue(consoleOutput.contains("City selected: Karachi"), "Should select Karachi");
-        assertTrue(consoleOutput.contains("Suggested Room"), "Should find a room");
-        assertTrue(consoleOutput.contains("Payment done"), "Should process payment");
-        assertTrue(consoleOutput.contains("Booking Completed Successfully"), "Final success message missing");
-    }
+    String consoleOutput = output.toString();
+    
+    // Verify key milestones are present in the output
+    // Line 49: Check for the hotel name instead of city selection
+assertTrue(consoleOutput.contains("Hotel: Movenpick"));
+
+// Line 50: Check for the successful status
+assertTrue(consoleOutput.contains("Completed Successfully"));
+
+// Line 51: Check for the masked card number
+assertTrue(consoleOutput.contains("Card Used: 1234XXXXXXXX"));
+}
 
     @Test
     void testGetValidInt_ValidInput() {

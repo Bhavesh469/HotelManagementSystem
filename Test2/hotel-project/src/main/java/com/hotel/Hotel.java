@@ -1,9 +1,14 @@
 package com.hotel;
+
 import java.util.ArrayList;
 
 public class Hotel {
+
     private String name;
-    private ArrayList<Room> rooms = new ArrayList<>();
+    private final ArrayList<Room> rooms = new ArrayList<>();
+    private final ArrayList<Reservation> reservations = new ArrayList<>();
+
+    // ---------------- CONSTRUCTOR ----------------
 
     public Hotel(String name) {
         if (name == null || name.trim().isEmpty()) {
@@ -11,6 +16,8 @@ public class Hotel {
         }
         this.name = name;
     }
+
+    // ---------------- ROOM METHODS ----------------
 
     public void addRoom(Room room) {
         if (room == null) {
@@ -32,12 +39,44 @@ public class Hotel {
         }
 
         for (Room r : rooms) {
-            if (r.isAvailable() && r.getType().getKind().equalsIgnoreCase(type)) {
+            if (r.isAvailable() &&
+                r.getType().getKind().equalsIgnoreCase(type)) {
                 return r;
             }
         }
         return null;
     }
+
+    // ---------------- RESERVATION METHODS (NEW) ----------------
+
+    public void addReservation(Reservation reservation) {
+        if (reservation == null) {
+            throw new IllegalArgumentException("Reservation cannot be null.");
+        }
+        reservations.add(reservation);
+    }
+
+    public void removeReservation(Reservation reservation) {
+        if (reservation == null) {
+            throw new IllegalArgumentException("Reservation cannot be null.");
+        }
+        reservations.remove(reservation);
+    }
+
+    public boolean hasReservation(Reservation reservation) {
+        if (reservation == null) return false;
+        return reservations.contains(reservation);
+    }
+    public Reservation findReservationByGuest(String guestName) {
+    for (Reservation res : reservations) {
+        if (res.getGuest().getName().equalsIgnoreCase(guestName)) {
+            return res;
+        }
+    }
+    return null;
+}
+
+    // ---------------- GETTERS ----------------
 
     public String getName() {
         return name;
